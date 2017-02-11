@@ -91,7 +91,7 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 //    foreach ($clients as $fd) {
         $body = [
             'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
-            'content' => htmlspecialchars($frame->data),
+            'content' => htmlspecialchars($frame->data),//尽量防治xss攻击
         ];
         $_server->push($fd, json_encode($body));
     }
