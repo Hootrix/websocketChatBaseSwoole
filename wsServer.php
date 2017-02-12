@@ -8,7 +8,7 @@
 
 $server = new swoole_websocket_server("0.0.0.0", 9501, SWOOLE_BASE);
 
-$clients = [];
+//$clients = [];
 function user_handshake(swoole_http_request $request, swoole_http_response $response)
 {
     //自定定握手规则，没有设置则用系统内置的（只支持version:13的）
@@ -40,7 +40,7 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
     }
     $response->status(101);
     $response->end();
-    global $server, $clients;
+    global $server;
     $fd = $request->fd;
     $server->defer(function () use ($fd, $server) {
         $body = [
@@ -48,16 +48,29 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
             'content' => "hello $fd, welcome\n",
         ];
         $server->push($fd, json_encode($body));
-        $clients[] = $fd;//添加客户端到容器
+//        $clients[] = $fd;//添加客户端到容器
     });
     return true;
 }
 
 $server->on('handshake', 'user_handshake');
 $server->on('open', function (swoole_websocket_server $_server, swoole_http_request $request) {
-    echo "server#{$_server->worker_pid}: handshake success with fd#{$request->fd}\n";
-    var_dump($_server->exist($request->fd), $_server->getClientInfo($request->fd));
+//    echo "server#{$_server->worker_pid}: handshake success with fd#{$request->fd}\n";
+//    var_dump($_server->exist($request->fd), $_server->getClientInfo($request->fd));
 //    var_dump($request);
+
+//    握手成功之后写入日志文件
+    $array = [
+        'worker_pid' => $_server->worker_pid,
+        'fd' => $request->fd,
+        'clientInfo' => $_server->getClientInfo($request->fd),
+        'request' => $request,
+    ];
+    $data = json_encode($array);
+    mkdir(dirname(__FILE__) . '/logs', 0700);
+    checkDeleteLogFile(dirname(__FILE__) . '/logs');
+    file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
+    $_server->push($request->fd, json_encode(['clients' => count($_server->connections)]));//发送给客户端所有客户端数量
 });
 
 $server->on('message', function (swoole_websocket_server $_server, $frame) {
@@ -89,9 +102,13 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
     //    global $clients;
     foreach ($_server->connections as $fd) {
 //    foreach ($clients as $fd) {
+        $obj = json_decode($frame->data);
+        $content = $obj->content;
+        $md5 = $obj->md5;
         $body = [
             'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
-            'content' => htmlspecialchars($frame->data),//尽量防治xss攻击
+            'content' => htmlspecialchars($content),//尽量防止xss攻击
+            'md5' => htmlspecialchars($md5),
         ];
         $_server->push($fd, json_encode($body));
     }
@@ -116,7 +133,7 @@ $server->on('packet', function ($_server, $data, $client) {
 });
 
 $server->on('request', function (swoole_http_request $request, swoole_http_response $response) {
-    $response->end(file_get_contents(dirname(__FILE__).'/chat.html'));
+    $response->end(file_get_contents(dirname(__FILE__) . '/chat.html'));
 //    $response->end(<<<HTML
 //
 //HTML
@@ -124,3 +141,33 @@ $server->on('request', function (swoole_http_request $request, swoole_http_respo
 });
 
 $server->start();
+
+
+/**
+ * 检查log目录 删除多余
+ * 保留最近指定数量的文件
+ *
+ * @param $dir 目录
+ * @param int $limit 保留时间最近的文件数
+ */
+function checkDeleteLogFile($dir, $limit = 10)
+{
+    $lscanLst = scandir($dir);
+    if ($lscanLst) {
+        $lscanLst = array_diff($lscanLst, ['.', '..']);
+        $total = count($lscanLst);
+        if ($total > $limit) {//若文件数量 较限制数大
+            usort($lscanLst, function ($a, $b) {
+                preg_match('/\d+/', $a, $_a);
+                preg_match('/\d+/', $b, $_b);
+                $a = $_a[0];
+                $b = $_b[0];
+                return $a - $b;//从小到大排序
+            });
+
+            for ($i = 0; $i < $total - $limit; $i++) {//删除多余文件
+                unlink($dir . '/' . $lscanLst[$i]);
+            }
+        }
+    }
+}
