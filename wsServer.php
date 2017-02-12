@@ -125,6 +125,9 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 
 $server->on('close', function ($_server, $fd) {
     echo "client {$fd} closed\n";
+    foreach ($_server->connections as $item) {
+        $_server->push($item, json_encode(['clients' => count($_server->connections)]));
+    }
 });
 
 $server->on('task', function ($_server, $worker_id, $task_id, $data) {
