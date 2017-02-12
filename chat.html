@@ -3,6 +3,7 @@
 <head>
 
     <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>消息投递 | HHTJim's部落格 Web App</title>
     <meta name="robots" content="noindex">
     <meta name="description" content="websocke通信管道建立的客户端公投消息应用"/>
@@ -623,13 +624,11 @@ Mixins
             bottom: -20px;
         }
 
-        @media screen and (max-width: 420px) {
+        @media screen and (max-resolution: 400dpi) and (max-width: 420px) {
             .chat {
                 width: 300px;
             }
         }
-
-
     </style>
 </head>
 <body>
