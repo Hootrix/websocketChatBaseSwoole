@@ -43,12 +43,30 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
     global $server;
     $fd = $request->fd;
     $server->defer(function () use ($fd, $server) {
-        $body = [
-            'client' => $fd,
-            'content' => "hello $fd, welcome\n",
-        ];
-        $server->push($fd, json_encode($body));
+//        $body = [
+//            'client' => $fd,
+//            'content' => "hello $fd, welcome\n",
+//        ];
+//        $server->push($fd, json_encode($body));
 //        $clients[] = $fd;//添加客户端到容器
+
+
+        //    握手成功之后写入日志文件
+        $array = [
+            'worker_pid' => $server->worker_pid,
+            'fd' => $fd,
+            'clientInfo' => $fd->getClientInfo($fd),
+        ];
+        $data = json_encode($array);
+        mkdir(dirname(__FILE__) . '/logs', 0700);
+        checkDeleteLogFile(dirname(__FILE__) . '/logs');
+        file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
+        $server->push($server->fd, json_encode([
+                'client' => $fd,
+                'content' => "hello $fd, welcome\n",
+                'clients' => count($server->connections)]
+        ));//发送给客户端所有客户端数量
+
     });
     return true;
 }
@@ -59,18 +77,6 @@ $server->on('open', function (swoole_websocket_server $_server, swoole_http_requ
 //    var_dump($_server->exist($request->fd), $_server->getClientInfo($request->fd));
 //    var_dump($request);
 
-//    握手成功之后写入日志文件
-    $array = [
-        'worker_pid' => $_server->worker_pid,
-        'fd' => $request->fd,
-        'clientInfo' => $_server->getClientInfo($request->fd),
-        'request' => $request,
-    ];
-    $data = json_encode($array);
-    mkdir(dirname(__FILE__) . '/logs', 0700);
-    checkDeleteLogFile(dirname(__FILE__) . '/logs');
-    file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
-    $_server->push($request->fd, json_encode(['clients' => count($_server->connections)]));//发送给客户端所有客户端数量
 });
 
 $server->on('message', function (swoole_websocket_server $_server, $frame) {
