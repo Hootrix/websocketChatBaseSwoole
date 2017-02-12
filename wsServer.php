@@ -63,8 +63,12 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         $server->push($fd, json_encode([
                 'client' => $fd,
                 'content' => "hello $fd, welcome\n",
-                'clients' => count($server->connections)]
+            ]
         ));//发送给客户端所有客户端数量
+
+        foreach ($server->connections as $item) {
+            $server->push($item, json_encode(['clients' => count($server->connections)]));
+        }
 
     });
     return true;
