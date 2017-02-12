@@ -60,7 +60,7 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         mkdir(dirname(__FILE__) . '/logs', 0700);
         checkDeleteLogFile(dirname(__FILE__) . '/logs');
         file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
-        $server->push($server->fd, json_encode([
+        $server->push($fd, json_encode([
                 'client' => $fd,
                 'content' => "hello $fd, welcome\n",
                 'clients' => count($server->connections)]
