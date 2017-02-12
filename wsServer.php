@@ -56,8 +56,8 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
             'worker_pid' => $server->worker_pid,
             'fd' => $fd,
         ];
-        $data = json_encode($array);
-        mkdir(dirname(__FILE__) . '/logs', 0700);
+        $data = json_encode($array) . "\n";
+        if (!file_exists(dirname(__FILE__) . '/logs')) mkdir(dirname(__FILE__) . '/logs', 0700);
         checkDeleteLogFile(dirname(__FILE__) . '/logs');
         file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
         $server->push($fd, json_encode([
