@@ -55,7 +55,6 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         $array = [
             'worker_pid' => $server->worker_pid,
             'fd' => $fd,
-            'clientInfo' => $fd->getClientInfo($fd),
         ];
         $data = json_encode($array);
         mkdir(dirname(__FILE__) . '/logs', 0700);
