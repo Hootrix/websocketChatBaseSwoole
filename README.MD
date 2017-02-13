@@ -1,7 +1,9 @@
 # 聊天室
 简单的聊天室功能，需要服务器安装php swoole扩展。
 
-测试：http://chat.hhtjim.com
+Demo：http://chat.hhtjim.com
+
+![demo](http://wx2.sinaimg.cn/large/6026770dgy1fcouju4rjpj20ag0flwfk.jpg)
 
 
 ### 服务器端：wsServer.php
