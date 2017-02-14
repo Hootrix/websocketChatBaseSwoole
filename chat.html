@@ -1033,7 +1033,7 @@ Hope you like it :)
         if ($.trim(msg) == '') {
             return false;
         }
-        $('<div class="message message-personal">' + msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        $('<div class="message message-personal">' + htmlEncode(msg) + '</div>').appendTo($('.mCSB_container')).addClass('new');
         setDate();
         $('.message-input').val(null);
         updateScrollbar();
@@ -1097,6 +1097,10 @@ Hope you like it :)
         newobj.setSelectionRange(0, oldhtml.length);
         //设置获得光标
         newobj.focus();
+    }
+    //Html编码获取Html转义实体
+    function htmlEncode(value) {
+        return $('<div/>').text(value).html();
     }
 
     //
