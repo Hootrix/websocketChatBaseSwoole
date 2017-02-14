@@ -62,12 +62,13 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
         $server->push($fd, json_encode([
                 'client' => $fd,
-                'content' => "hello $fd, welcome\n",
+                'content' => "hello $fd, welcome",
             ]
         ));//发送给客户端所有客户端数量
 
+        $json = json_encode(['clients' => count($server->connections)]);
         foreach ($server->connections as $item) {
-            $server->push($item, json_encode(['clients' => count($server->connections)]));
+            $server->push($item, $json);
         }
 
     });
@@ -108,25 +109,27 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 //        });
 //    }
 
-    //    global $clients;
+
+    $obj = json_decode($frame->data);
+    $content = $obj->content;
+    $md5 = $obj->md5;
+    $body = [
+        'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
+        'content' => htmlspecialchars($content),//尽量防止xss攻击
+        'md5' => htmlspecialchars($md5),
+    ];
+    $json = json_encode($body);
     foreach ($_server->connections as $fd) {
-//    foreach ($clients as $fd) {
-        $obj = json_decode($frame->data);
-        $content = $obj->content;
-        $md5 = $obj->md5;
-        $body = [
-            'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
-            'content' => htmlspecialchars($content),//尽量防止xss攻击
-            'md5' => htmlspecialchars($md5),
-        ];
-        $_server->push($fd, json_encode($body));
+        $_server->push($fd, $json);
     }
 });
 
 $server->on('close', function ($_server, $fd) {
     echo "client {$fd} closed\n";
+
+    $json = json_encode(['clients' => count($_server->connections)]);
     foreach ($_server->connections as $item) {
-        $_server->push($item, json_encode(['clients' => count($_server->connections)]));
+        $_server->push($item, $json);
     }
 });
 
