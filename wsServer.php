@@ -112,6 +112,8 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 
     $obj = json_decode($frame->data);
     $content = $obj->content;
+    if (empty($content)) return;
+
     $md5 = $obj->md5;
     $body = [
         'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
