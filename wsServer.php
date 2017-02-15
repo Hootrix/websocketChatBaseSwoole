@@ -117,7 +117,6 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
     $md5 = $obj->md5;
     $body = [
         'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
-//        'content' => iconv('gbk', 'utf-8', htmlspecialchars($content)),//尽量防止xss攻击;转换到utf-8 防止json_encode输出为空
         'content' => htmlspecialchars($content),//尽量防止xss攻击;转换到utf-8 防止json_encode输出为空
         'md5' => htmlspecialchars($md5),
     ];
