@@ -111,7 +111,7 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 
 
     $obj = json_decode($frame->data);
-    $content = iconv('gbk', 'utf-8', $obj->content);
+    $content = $obj->content;
     if (empty($content)) return;
 
     $md5 = $obj->md5;
