@@ -117,7 +117,8 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
     $md5 = $obj->md5;
     $body = [
         'sender' => $frame->fd,//发送消息的客户端   $fd 为接收的客户端
-        'content' => iconv('gbk', 'utf-8', htmlspecialchars($content)),//尽量防止xss攻击;转换到utf-8 防止json_encode输出为空
+//        'content' => iconv('gbk', 'utf-8', htmlspecialchars($content)),//尽量防止xss攻击;转换到utf-8 防止json_encode输出为空
+        'content' => htmlspecialchars($content),//尽量防止xss攻击;转换到utf-8 防止json_encode输出为空
         'md5' => htmlspecialchars($md5),
     ];
     $json = json_encode($body);
@@ -150,13 +151,14 @@ $server->on('packet', function ($_server, $data, $client) {
 });
 
 $server->on('request', function (swoole_http_request $request, swoole_http_response $response) {
-    $response->end(file_get_contents(dirname(__FILE__) . '/chat.html'));
+    global $chatHtml;
+    $response->end($chatHtml);
 //    $response->end(<<<HTML
 //
 //HTML
 //    );
 });
-
+$chatHtml = file_get_contents(dirname(__FILE__) . '/chat.html');
 $server->start();
 
 
