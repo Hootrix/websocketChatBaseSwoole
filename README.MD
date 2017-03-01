@@ -12,7 +12,7 @@ Demo：http://chat.hhtjim.com
 
 
 ### 客户端 ：chat.html  
-通过websocke通信
+通过websocket通信.请勿使用IE家族浏览器访问
 
 #### 客户端UI  
 codepen.io
