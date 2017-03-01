@@ -958,7 +958,8 @@ Hope you like it :)
         insertMessage();
         var send = JSON.stringify({
             'md5': md5,
-            'content': $.trim(msg),
+//            'content': $.trim(msg),
+            'content': msg,
         })
         websocket.send(send);
     }
