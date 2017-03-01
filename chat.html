@@ -1028,7 +1028,7 @@ Hope you like it :)
 //        updateScrollbar();
 
         $('.message.loading').remove();
-        $('<div class="message new"><figure class="avatar"><img src="//secure.gravatar.com/avatar/' + obj.md5 + '?s=80&r=g" /></figure><div class="name">' + name + '</div>' + message + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        $('<div class="message new"><figure class="avatar"><img src="//secure.gravatar.com/avatar/' + obj.md5 + '?s=80&r=g" /></figure><div class="name">' + name + '</div><pre>' + message + '</pre></div>').appendTo($('.mCSB_container')).addClass('new');
         setDate();
         updateScrollbar();
         i++;
@@ -1038,7 +1038,7 @@ Hope you like it :)
         if ($.trim(msg) == '') {
             return false;
         }
-        $('<div class="message message-personal">' + htmlEncode(msg) + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        $('<div class="message message-personal"><pre>' + htmlEncode(msg) + '</pre></div>').appendTo($('.mCSB_container')).addClass('new');
         setDate();
         $('.message-input').val(null);
         updateScrollbar();
