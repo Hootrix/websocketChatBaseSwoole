@@ -72,13 +72,13 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
 //            }
 //            $server->push($fd, $v['json']);
 //        }
-//
-//
-//        //发送给客户端所有客户端数量
-//        $json = json_encode(['clients' => count($server->connections)]);
-//        foreach ($server->connections as $item) {
-//            $server->push($item, $json);
-//        }
+
+
+        //发送给客户端所有客户端数量
+        $json = json_encode(['clients' => count($server->connections)]);
+        foreach ($server->connections as $item) {
+            $server->push($item, $json);
+        }
 
     });
     return true;
