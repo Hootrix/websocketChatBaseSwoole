@@ -133,14 +133,14 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 
 
     global $stack;
-    array_unshift($stack,[//头部插入
+    array_push($stack,[//尾进
         'time'=>time(),
         'json'=>json_encode($body),
     ]);
 
     //只保留5个新的消息内容
     while(count($stack) > 5){
-        array_pop($stack);
+        array_shift($stack);//头出
     }
 
 
