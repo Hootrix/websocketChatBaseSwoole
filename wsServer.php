@@ -124,7 +124,7 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
 $server->on('close', function ($_server, $fd) {
     echo "client {$fd} closed\n";
 
-    $json = json_encode(['clients' => count($_server->connections),'action'=>'close']);
+    $json = json_encode(['clients' => count($_server->connections) - 1,'action'=>'close']);
     foreach ($_server->connections as $item) {
         $_server->push($item, $json);
     }
