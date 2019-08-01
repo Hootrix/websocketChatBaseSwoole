@@ -67,8 +67,8 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         $now = time();
         foreach ($stack as $k => $v){
             if( $now - $v['time'] > 5 * 60 ){//消息时间 大于5分钟
-//                unset($stack[$k]);
-//                continue;
+                unset($stack[$k]);
+                continue;
             }
 //            $server->push($fd, $v['json']);
         }
