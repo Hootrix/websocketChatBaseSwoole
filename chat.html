@@ -906,15 +906,16 @@ Hope you like it :)
 </script>
 <script>
     var heartCheck = {
-        timeout: 5000,//6s
+        timeout: 5000,//5s
         timeoutObj: null,
         reset: function () {
-            clearTimeout(this.timeoutObj);
+//            clearTimeout(this.timeoutObj);
+            clearInterval(this.timeoutObj);
             this.start();
         },
         start: function () {
-            this.timeoutObj = setTimeout(function () {
-                websocket.send("");
+            this.timeoutObj = setInterval(function () {
+                websocket.send("ping");
             }, this.timeout)
         }
     }
@@ -924,7 +925,7 @@ Hope you like it :)
         websocket = new WebSocket(wsServer);
         websocket.onopen = function (evt) {
             console.log("Connected to WebSocket server.");
-            heartCheck.start();
+            heartCheck.reset();
         };
 
         websocket.onclose = function (evt) {
@@ -940,8 +941,6 @@ Hope you like it :)
             console.log('Retrieved data from server: ' + evt.data);
             cancelMask();
             insertServerMessage(evt.data);
-            heartCheck.reset();
-
         };
 
         websocket.onerror = function (evt, e) {
