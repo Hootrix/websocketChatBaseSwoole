@@ -52,20 +52,15 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
 
 
         //    握手成功之后写入日志文件
-        $array = [
-            'worker_pid' => $server->worker_pid,
-            'fd' => $fd,
-        ];
-        $data = json_encode($array) . "\n";
-        if (!file_exists(dirname(__FILE__) . '/logs')) mkdir(dirname(__FILE__) . '/logs', 0700);
-        checkDeleteLogFile(dirname(__FILE__) . '/logs');
-        file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
+//        write_log($server,$fd);
+
         $server->push($fd, json_encode([
                 'client' => $fd,
                 'content' => "hello $fd, welcome",
             ]
-        ));//发送给客户端所有客户端数量
+        ));
 
+        //发送给客户端所有客户端数量
         $json = json_encode(['clients' => count($server->connections)]);
         foreach ($server->connections as $item) {
             $server->push($item, $json);
@@ -188,5 +183,16 @@ function checkDeleteLogFile($dir, $limit = 10)
             }
         }
     }
+}
+
+function write_log($server,$fd){
+    $array = [
+        'worker_pid' => $server->worker_pid,
+        'fd' => $fd,
+    ];
+    $data = json_encode($array) . "\n";
+    if (!file_exists(dirname(__FILE__) . '/logs')) mkdir(dirname(__FILE__) . '/logs', 0700);
+    checkDeleteLogFile(dirname(__FILE__) . '/logs');
+    file_put_contents(dirname(__FILE__) . "/logs/open-" . date('Ymd') . ".logs", $data, FILE_APPEND);
 }
 
