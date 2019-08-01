@@ -70,7 +70,7 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
                 unset($stack[$k]);
                 continue;
             }
-//            $server->push($fd, $v['json']);
+            $server->push($fd, $v['json']);
         }
 
 
