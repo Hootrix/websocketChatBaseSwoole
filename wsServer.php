@@ -63,22 +63,22 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
         ));
 
         //发送最近5条消息给新的客户端
-        global $stack;
-        $now = time();
-        foreach ($stack as $k => $v){
-            if( $now - $v['time'] > 5 * 60 ){//消息时间 大于5分钟
-                unset($stack[$k]);
-                continue;
-            }
-            $server->push($fd, $v['json']);
-        }
-
-
-        //发送给客户端所有客户端数量
-        $json = json_encode(['clients' => count($server->connections)]);
-        foreach ($server->connections as $item) {
-            $server->push($item, $json);
-        }
+//        global $stack;
+//        $now = time();
+//        foreach ($stack as $k => $v){
+//            if( $now - $v['time'] > 5 * 60 ){//消息时间 大于5分钟
+//                unset($stack[$k]);
+//                continue;
+//            }
+//            $server->push($fd, $v['json']);
+//        }
+//
+//
+//        //发送给客户端所有客户端数量
+//        $json = json_encode(['clients' => count($server->connections)]);
+//        foreach ($server->connections as $item) {
+//            $server->push($item, $json);
+//        }
 
     });
     return true;
