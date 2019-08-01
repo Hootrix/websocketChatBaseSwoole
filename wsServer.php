@@ -8,6 +8,8 @@
 
 $server = new swoole_websocket_server("0.0.0.0", 9501, SWOOLE_BASE);
 
+$stack = [];//保存5条数据最近5分钟内的数据
+
 //$clients = [];
 function user_handshake(swoole_http_request $request, swoole_http_response $response)
 {
@@ -59,6 +61,18 @@ function user_handshake(swoole_http_request $request, swoole_http_response $resp
                 'content' => "hello $fd, welcome",
             ]
         ));
+
+        //发送最近5条消息给新的客户端
+        global $stack;
+        $now = time();
+        foreach ($stack as $k => $v){
+            if( $now - $v['time'] > 5 * 60 ){//消息时间 大于5分钟
+                unset($stack[$k]);
+                continue;
+            }
+            $server->push($fd, $v['json']);
+        }
+
 
         //发送给客户端所有客户端数量
         $json = json_encode(['clients' => count($server->connections)]);
@@ -116,6 +130,20 @@ $server->on('message', function (swoole_websocket_server $_server, $frame) {
         'md5' => htmlspecialchars($md5),
     ];
     $json = json_encode($body);
+
+
+    global $stack;
+    $s_count = array_unshift($stack,[//头部插入
+        'time'=>time(),
+        'json'=>json_encode($body),
+    ]);
+
+    //只保留5个新的消息内容
+    while($s_count > 5){
+        array_pop($stack);
+    }
+
+
     foreach ($_server->connections as $fd) {
         $_server->push($fd, $json);
     }
